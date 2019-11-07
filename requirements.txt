@@ -1,0 +1,6 @@
+cx_Oracle
+flask
+requests
+cherrypy==18.2.0
+paste
+sesamutils==0.1.10
