@@ -3,9 +3,9 @@ Docker oracle integration courtesy of [egojason/docker-python-oracle](https://gi
   
 This docker image serves as a microservice to be used in an HTTP transform by executing queries to a database for entities.
 
-##How to use:
-###Setup environment
-####Dev phase
+## How to use:
+### Setup environment
+#### Dev phase
 1. Create testing environment
     * Recommended using PyCharm with Docker integration to easily set environment variables for the container during the testing phase.
     * Otherwise set the env variables in your terminal environment and run something like 
@@ -29,7 +29,7 @@ This docker image serves as a microservice to be used in an HTTP transform by ex
 3. Use ```curl 0.0.0.0:5000/transform -X POST -d '{"_id":"mock-data"}'``` and look at the result
     * If something goes wrong use ```docker logs httpOracle```
 
-####Sesam Testing Phase
+#### Sesam Testing Phase
 1. Run the microservice inside Sesam.
  System config:
 ```
