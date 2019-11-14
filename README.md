@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/sesam-community/oracle-transform.svg?branch=master)](https://travis-ci.org/sesam-community/oracle-transform)
+
 # oracle-transform
 Docker oracle integration courtesy of [egojason/docker-python-oracle](https://github.com/egojason/docker-python-oracle)
   
