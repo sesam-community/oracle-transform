@@ -13,22 +13,22 @@ def do_meterpoint_query(dbconnection, variables, logger, entity):
                 if key == 'ifs-quadrantsreading:cons_uninstalled_reading':
                     result = map_query(inner_query_result, 1, include_estimate)
                     if result:
-                        inner_entity['ifs-quadrantsreading:cons_uninstalled_reading'] = str(round(result))
+                        inner_entity['ifs-quadrantsreading:cons_uninstalled_reading'] = str(result)
                         changed = True
                 elif key == 'ifs-quadrantsreading:prod_uninstalled_reading':
                     result = map_query(inner_query_result, 2, include_estimate)
                     if result:
-                        inner_entity['ifs-quadrantsreading:prod_uninstalled_reading'] = str(round(result))
+                        inner_entity['ifs-quadrantsreading:prod_uninstalled_reading'] = str(result)
                         changed = True
                 elif key == 'ifs-quadrantsreading:react_uninstalled_reading':
                     result = map_query(inner_query_result, 3, include_estimate)
                     if result:
-                        inner_entity['ifs-quadrantsreading:react_uninstalled_reading'] = str(round(result))
+                        inner_entity['ifs-quadrantsreading:react_uninstalled_reading'] = str(result)
                         changed = True
                 elif key == 'ifs-quadrantsreading:prod_react_uninstalled_reading':
                     result = map_query(inner_query_result, 4, include_estimate)
                     if result:
-                        inner_entity['ifs-quadrantsreading:react_uninstalled_reading'] = str(round(result))
+                        inner_entity['ifs-quadrantsreading:react_uninstalled_reading'] = str(result)
                         changed = True
         if changed:
             inner_entity['tmp_readings_from'] = 'Quant'
