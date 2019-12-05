@@ -5,29 +5,16 @@ from sesamutils.sesamlogger import sesam_logger
 class OracleDB:
     def __init__(self, host, port, database, username, password):
         """
-        A class used to connect to oracle databases
-        It automatically initiates the connection during creation.
-        ...
+        A class used to connect to oracle databases. It automatically initiates the connection during creation.
 
-        Attributes
-        ----------
-        host : str
-            host url or IP
-        port : int
-            Standard 1521, but can variate.
-        database : str
-            The database name
-        username : str
-        password : str
+        :param str host: Host to connect to. Either url or IP
+        :param int port: Port to use for connection.
+        :param str database: Database name.
+        :param username: :P
+        :param password: yeah...
 
-        Methods
-        -------
-        do_query(query)
-            Excecutes the query against the database and returns all results.
-
-        create_connection()
-            Initiates a connection to the database.
-
+        do_query(query): Executes the query against the database and returns all results.
+        create_connection(): Initiates a connection to the database.
         """
         self.logger = sesam_logger(logger_name='Database Connection', timestamp=True)
         self.host = host
@@ -41,20 +28,13 @@ class OracleDB:
     def do_query(self, query):
         """Returns the result of the query it is passed.
 
-        Does not support None as query.
-        It will automatically try to re-initate the database connection if the first try fails.
-        If this fails it will break.
+        It will automatically try to re-initate the database connection if it has dropped.
+            ^If this fails it will break.
 
-        Parameters
-        ----------
-        query : str
-            the query to excecute
+        :param str query: The query to excecute.
 
-        Returns
-        -------
-        list(list())
-            Each element of the list returned is a row.
-            Each row is a list of the column values returned by the query.
+        :returns: List of dictionaries where key is column name and value is column value eg [{col_n: col_v}]
+        :rtype: list(dict())
         """
 
         try:
@@ -63,9 +43,19 @@ class OracleDB:
             self.logger.warning(f'Got error "{e}".\nTrying to reconnect to Database!\n')
             self.connection = self.create_connection()
             self.cursor = self.connection.cursor()
-            self.logger.warning(f'Trying to do query again: "{query}".')
+            self.logger.warning(f'Connection successful! Trying to do query again: "{query}".')
             self.cursor.execute(query)
-        return self.cursor.fetchall()
+
+        # Match column names with column values to build [{column_name: column_value}, {...}, ...]
+        columns = self.cursor.description
+        output = []
+        for row in self.cursor.fetchall():
+            row_dict = {}
+            for index, column_value in enumerate(row):
+                row_dict[columns[index][0]] = column_value
+            output.append(row_dict)
+
+        return output
 
     def create_connection(self):
         """Creates a connection to the database using object values."""
