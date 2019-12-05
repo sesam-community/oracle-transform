@@ -1,6 +1,6 @@
 
 
-def do_meterpoint_query(dbconnection, variables, logger, entity):
+def do_meterpoint_query(dbconnection, variables, logger, entity, query_keys):
     """I'm used at Hafslund to grab readings for meterpoints from Quant
         Maintaned by Gabriell Constantin Vig
     """
