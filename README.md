@@ -16,11 +16,10 @@ This docker image serves as a microservice to be used in an HTTP transform by ex
 
 * !!!Setup your query to use '{key}' to grab values from the entity!
     * Like this ```SELECT * FROM A WHERE a.ID = '{_id}'```
-        * This query will use the current entity's _id and pass it into the query.  
+        * This example will use the current entity's _id and pass it into the query.  
  
-2. Create your own handler in handlers.python
-    * You probably need your own handler to get the values you want back from the query.
-        * Look at do_meterpoint_query handler for inspiration.
+2. Use generic handler or Create your own handler in handlers.python
+    * ```generic_handler``` returns an entity appended with the query result. This will be a list where each row is a dictionary.
     * Each handler needs the parameters: ```dbconnection, variables, logger, entity```
         * _Variables_ to get the query.
         * _dbconnection_ to run the query against.
@@ -41,29 +40,42 @@ This docker image serves as a microservice to be used in an HTTP transform by ex
   "docker": {
     "environment": {
       "LOG_LEVEL": "WARNING",
-      "database": "$ENV(HTTP_ORACLE_DATABASE)",
-      "handler": "<your-own-handler>",
-      "host": "$ENV(HTTP_ORACLE_HOST)",
-      "password": "$SECRET(HTTP_ORACLE_PASSWORD)",
-      "port": 1521,
-      "query": "SELECT * FROM a WHERE a.ID = '{_id}' AND a.phone_no = '{phone_no}",
-      "username": "$ENV(HTTP_ORACLE_USERNAME)"
+      "db_database": "$ENV(HTTP_ORACLE_DATABASE)",
+      "db_host": "$ENV(HTTP_ORACLE_HOST)",
+      "db_password": "$SECRET(HTTP_ORACLE_PASSWORD)",
+      "db_port": 1521,
+      "db_username": "$ENV(HTTP_ORACLE_USERNAME)",
+      "handler": "generic_handler",
+      "query": "SELECT address, zip FROM a WHERE a.ID = '{_id}' AND a.phone_no = '{phone_no}'"
     },
-    "image": "<your-usr>/http-oracle-transform",
+    "image": "sesamcommunity/oracle-transform:1.1.0",
     "port": 5000
   },
   "verify_ssl": true
 }
 ```
 Pipe example config
-```{
+```
+{
   "_id": "testing-http-transform",
   "type": "pipe",
   "source": {
     "type": "embedded",
-    "entities":[{"_id":"mock-data"}]
+    "entities":[{
+        "_id":"im in a query wohoo",
+        "phone_no": "call me maybe"
+    }]
   },
   "transform": [{
+    "type": "dtl",
+    "rules": {
+      "default": [
+        ["copy", "*"],
+        ["add", "::do_query", [<Condition-To-Do-Query>]]
+      ]
+    }
+  }.
+  {
     "type": "http",
     "system": "http-oracle-transform",
     "batch_size": 100,
@@ -76,5 +88,24 @@ Pipe example config
       ]
     }
   }]
+}
+```
+
+If the example configs where used above the microservice would put the keys from the entity into the query like this:<br>
+```SELECT address, zip, subs FROM a WHERE a.ID = 'im in a query wohoo' AND a.phone_no = 'call me maybe'```<br>
+and if the conditon for ```do_query == TRUE``` and the query returned for example two rows, the output would look like this:
+```
+{
+    "_id":"im in a query wohoo",
+    "phone_no": "call me maybe",
+    "do_query": true
+    "query_result": [
+    {
+        "adress": "spoofed",
+        "zip": 1337
+    }, {
+        "adress": "MI7",
+        "zip": 0007
+    }]
 }
 ```

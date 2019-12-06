@@ -33,7 +33,7 @@ class OracleDB:
 
         :param str query: The query to excecute.
 
-        :returns: List of dictionaries where key is column name and value is column value eg [{col_n: col_v}]
+        :returns: List of dicts where dict = row and key = column name and value = column value eg [{col_n: col_v}]
         :rtype: list(dict())
         """
 
@@ -52,7 +52,7 @@ class OracleDB:
         for row in self.cursor.fetchall():
             row_dict = {}
             for index, column_value in enumerate(row):
-                row_dict[columns[index][0]] = column_value
+                row_dict[str(columns[index][0])] = str(column_value)
             output.append(row_dict)
 
         return output
