@@ -28,17 +28,26 @@ def stream_json(testing):
 @app.route('/transform', methods=['POST'])
 def receiver():
     """This function iterates over input entities and returns the handled version.
-    To use this properly add your own method inside handlers.py, and specify this method as the env variable 'handler'
-    Make sure your handler skips entities which do not need the query…
+    You can use the generic_handler if you just want the query result appended to your entity.
+    Otherwise you can create your own handler in handlers.py to customize your handling...
+
+    Make sure to append entities on their way in here with 'do_query': true/false. Unless you want to overload me
     """
-    # get entities from request
     req_entities = request.get_json()
     output = []
     try:
         for entity in req_entities:
-            handler = getattr(handlers, variables.handler)
-            entity = handler(databaseConnection, variables, logger, entity)
-            logger.debug(f'Appending entity: {json.dumps(entity)} to output!')
+            logger.debug(f'Input entity: {json.dumps(entity)}')
+            do_query = True  # If do_query is missing from the entity we will do the query anyways.
+            if 'do_query' in entity:  # Check if entity has do_query key
+                do_query = entity['do_query']
+            else:
+                logger.warning(f'Key "do_query" is missing from the input entity! Doing query for EVERY entity.')
+
+            if do_query:
+                handler = getattr(handlers, variables.handler) # Get the handler from env vars.
+                entity = handler(databaseConnection, variables, logger, entity) # Append entity with handler.
+            logger.debug(f'Output entity: {json.dumps(entity)}')
             output.append(entity)
     except TypeError as e:
         logger.critical('Wrong type gave error: {}'.format(e))
